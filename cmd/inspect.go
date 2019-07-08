@@ -50,7 +50,16 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			panic(err)
 		}
+
+		fmt.Println()
+
 		for _, detail := range devStatus.Detail {
+			for _, branch := range detail.Branches {
+				fmt.Printf("git checkout %s\t [%s]\n", branch.Name, branch.Repository.Name)
+			}
+
+			fmt.Println()
+
 			for _, pr := range detail.PullRequests {
 				fmt.Printf("Related Pull Request: %s\n", pr.URL)
 				if shouldOpen && pr.Status == "OPEN" {
