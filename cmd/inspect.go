@@ -7,9 +7,11 @@ import (
 	"github.com/spf13/viper"
 
 	jira "github.com/andygrunwald/go-jira"
-	models "github.com/darkcl/jira/models"
 	helpers "github.com/darkcl/jira/helpers"
+	models "github.com/darkcl/jira/models"
 )
+
+var shouldOpen bool
 
 // inspectCmd represents the inspect command
 var inspectCmd = &cobra.Command{
@@ -51,16 +53,24 @@ to quickly create a Cobra application.`,
 		for _, detail := range devStatus.Detail {
 			for _, pr := range detail.PullRequests {
 				fmt.Printf("Related Pull Request: %s\n", pr.URL)
-				helpers.OpenBrowser(pr.URL)
+				if shouldOpen && pr.Status == "OPEN" {
+					helpers.OpenBrowser(pr.URL)
+				}
 			}
 		}
 
-		fmt.Printf("Open: %s/browse/%s\n", viper.GetString("host"), issue.Key)
+		browserURL := fmt.Sprintf("%s/browse/%s", viper.GetString("host"), issue.Key)
+
+		fmt.Printf("Issue URL: %s\n", browserURL)
+		if shouldOpen {
+			helpers.OpenBrowser(browserURL)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(inspectCmd)
+	rootCmd.PersistentFlags().BoolVarP(&shouldOpen, "open", "o", false, "Open in browser")
 
 	// Here you will define your flags and configuration settings.
 
