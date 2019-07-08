@@ -3,11 +3,10 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os/exec"
-	"runtime"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	helpers "github.com/darkcl/jira/helpers"
 )
 
 // openCmd represents the open command
@@ -24,26 +23,8 @@ to quickly create a Cobra application.`,
 
 		ticketURL := fmt.Sprintf("%s/browse/%s", viper.GetString("host"), args[0])
 		log.Println(ticketURL)
-		openBrowser(ticketURL)
+		helpers.OpenBrowser(ticketURL)
 	},
-}
-
-func openBrowser(url string) {
-	var err error
-
-	switch runtime.GOOS {
-	case "linux":
-		err = exec.Command("xdg-open", url).Start()
-	case "windows":
-		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
-	case "darwin":
-		err = exec.Command("open", url).Start()
-	default:
-		err = fmt.Errorf("unsupported platform")
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func init() {

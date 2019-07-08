@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/viper"
 
 	jira "github.com/andygrunwald/go-jira"
+	models "github.com/darkcl/jira/models"
+	helpers "github.com/darkcl/jira/helpers"
 )
 
 // inspectCmd represents the inspect command
@@ -34,8 +36,26 @@ to quickly create a Cobra application.`,
 			fmt.Printf("\nerror: %v\n", err)
 			return
 		}
-		fmt.Printf("[%s] %s\n", issue.Key, issue.Fields.Summary)
-		fmt.Printf("Open: %s/browse/%s", viper.GetString("host"), issue.Key)
+		fmt.Printf("[%s](%s) %s\n", issue.Key, issue.ID, issue.Fields.Summary)
+		fmt.Printf("Status: %s \n", issue.Fields.Status.Name)
+
+		prEndpoint := fmt.Sprintf("rest/dev-status/1.0/issue/detail?issueId=%s&applicationType=bitbucket&dataType=pullrequest", issue.ID)
+
+		req, _ := client.NewRequest("GET", prEndpoint, nil)
+
+		devStatus := new(models.DevelopStatus)
+		_, err = client.Do(req, devStatus)
+		if err != nil {
+			panic(err)
+		}
+		for _, detail := range devStatus.Detail {
+			for _, pr := range detail.PullRequests {
+				fmt.Printf("Related Pull Request: %s\n", pr.URL)
+				helpers.OpenBrowser(pr.URL)
+			}
+		}
+
+		fmt.Printf("Open: %s/browse/%s\n", viper.GetString("host"), issue.Key)
 	},
 }
 
