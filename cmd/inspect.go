@@ -40,6 +40,7 @@ to quickly create a Cobra application.`,
 		}
 		fmt.Printf("[%s](%s) %s\n", issue.Key, issue.ID, issue.Fields.Summary)
 		fmt.Printf("Status: %s \n", issue.Fields.Status.Name)
+		fmt.Printf("Assignee: %s \n", issue.Fields.Assignee.DisplayName)
 
 		prEndpoint := fmt.Sprintf("rest/dev-status/1.0/issue/detail?issueId=%s&applicationType=bitbucket&dataType=pullrequest", issue.ID)
 
@@ -61,7 +62,9 @@ to quickly create a Cobra application.`,
 			fmt.Println()
 
 			for _, pr := range detail.PullRequests {
-				fmt.Printf("Related Pull Request: %s\n", pr.URL)
+				fmt.Printf("Pull Request: %s [%s]\n", pr.Name, pr.Status)
+				fmt.Printf("Pull Request URL: %s \n\n", pr.URL)
+
 				if shouldOpen && pr.Status == "OPEN" {
 					helpers.OpenBrowser(pr.URL)
 				}
