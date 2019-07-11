@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -30,9 +31,22 @@ to quickly create a Cobra application.`,
 			Username: user,
 			Password: accessKey,
 		}
+		dir, _ := os.Getwd()
+
+		var ticketNumber string
+		if len(args) > 0 {
+			ticketNumber = args[0]
+		} else {
+			ticketNumber = helpers.GetTicketNumberFromGit(dir)
+		}
+
+		if len(ticketNumber) == 0 {
+			fmt.Printf("Jira ticket not provided.\n")
+			return
+		}
 
 		client, _ := jira.NewClient(tp.Client(), viper.GetString("host"))
-		issue, _, err := client.Issue.Get(args[0], nil)
+		issue, _, err := client.Issue.Get(ticketNumber, nil)
 
 		if err != nil {
 			fmt.Printf("\nerror: %v\n", err)
