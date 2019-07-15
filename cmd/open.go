@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"log"
+	"os"
 
+	helpers "github.com/darkcl/jira/helpers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	helpers "github.com/darkcl/jira/helpers"
 )
 
 // openCmd represents the open command
@@ -20,9 +20,21 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		dir, _ := os.Getwd()
+		var ticketNumber string
+		if len(args) > 0 {
+			ticketNumber = args[0]
+		} else {
+			ticketNumber = helpers.GetTicketNumberFromGit(dir)
+		}
 
-		ticketURL := fmt.Sprintf("%s/browse/%s", viper.GetString("host"), args[0])
-		log.Println(ticketURL)
+		if len(ticketNumber) == 0 {
+			fmt.Printf("Jira ticket not provided.\n")
+			return
+		}
+
+		ticketURL := fmt.Sprintf("%s/browse/%s", viper.GetString("host"), ticketNumber)
+		fmt.Println(ticketURL)
 		helpers.OpenBrowser(ticketURL)
 	},
 }
