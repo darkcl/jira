@@ -91,6 +91,14 @@ to quickly create a Cobra application.`,
 		if shouldOpen {
 			helpers.OpenBrowser(browserURL)
 		}
+
+		fmt.Printf("================================\n\n")
+		epic := helpers.GetEpicFromIssue(issue.ID, client)
+		epicURL := fmt.Sprintf("%s/browse/%s", viper.GetString("host"), epic.Key)
+		fmt.Printf("Epic URL: %s\n", epicURL)
+		if shouldOpen {
+			helpers.OpenBrowser(epicURL)
+		}
 	},
 }
 
