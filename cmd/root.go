@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -67,7 +68,8 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".jira")
 	}
-
+	viper.SetEnvPrefix("JIRA")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

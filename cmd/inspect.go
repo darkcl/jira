@@ -37,8 +37,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		user := viper.GetString("jira_user")
-		accessKey := viper.GetString("jira_access_key")
+		user := viper.GetString("user")
+		accessKey := viper.GetString("access_key")
 		tp := jira.BasicAuthTransport{
 			Username: user,
 			Password: accessKey,
@@ -67,9 +67,9 @@ to quickly create a Cobra application.`,
 		if shouldOutputAlfred {
 			alfred.Add(alfred.Item{
 				Title:    ticketNumber,
-				Subtitle: "Issue Key",
+				Subtitle: "Open in browser",
 				Arg:      browserURL,
-				UID:      "issue.Key",
+				UID:      "03-issue.Key",
 			})
 		}
 
@@ -99,6 +99,15 @@ to quickly create a Cobra application.`,
 		for _, detail := range devStatus.Detail {
 			for _, branch := range detail.Branches {
 				consoleLog("git checkout %s\t [%s]\n", branch.Name, branch.Repository.Name)
+				if shouldOutputAlfred {
+					repoTitle := fmt.Sprintf("Branch of %s: %s", branch.Repository.Name, branch.Name)
+					alfred.Add(alfred.Item{
+						Title:    "Repository",
+						Subtitle: repoTitle,
+						Arg:      branch.URL,
+						UID:      "02-details.repo",
+					})
+				}
 			}
 
 			consoleLog("\n")
@@ -113,10 +122,10 @@ to quickly create a Cobra application.`,
 
 				if shouldOutputAlfred && pr.Status == "OPEN" {
 					alfred.Add(alfred.Item{
-						Title:    issue.Key,
-						Subtitle: "Pull Request",
+						Title:    "Pull Request",
+						Subtitle: pr.Name,
 						Arg:      pr.URL,
-						UID:      "pull.request",
+						UID:      "01-pull.request",
 					})
 				}
 			}
